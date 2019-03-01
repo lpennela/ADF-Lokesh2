@@ -1,5 +1,5 @@
 {
-	"name": "DS_ADLS_EMP_Max_TGT",
+	"name": "DS_ADLS_Files_SRC",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_ADLS",
@@ -9,18 +9,33 @@
 			"name": "Max EMP File Extract"
 		},
 		"type": "AzureDataLakeStoreFile",
+		"structure": [
+			{
+				"name": "DID",
+				"type": "String"
+			},
+			{
+				"name": "DNAME",
+				"type": "String"
+			},
+			{
+				"name": "MGR",
+				"type": "String"
+			}
+		],
 		"typeProperties": {
 			"format": {
 				"type": "TextFormat",
 				"columnDelimiter": ",",
 				"rowDelimiter": "",
-				"nullValue": "\\N",
+				"quoteChar": "\"",
+				"nullValue": "",
 				"treatEmptyAsNull": true,
 				"skipLineCount": 0,
-				"firstRowAsHeader": false
+				"firstRowAsHeader": true
 			},
 			"fileName": "",
-			"folderPath": "Outbound/Emp_Max"
+			"folderPath": "EMP"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"

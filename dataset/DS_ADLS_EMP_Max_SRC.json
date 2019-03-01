@@ -10,6 +10,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "Max EMP File Extract"
+		},
 		"type": "AzureDataLakeStoreFile",
 		"typeProperties": {
 			"format": {

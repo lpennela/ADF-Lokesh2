@@ -1,0 +1,215 @@
+{
+	"name": "PL_ADLS_to_ADLS_MAX_SEQ_FIlE_CPY",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_ADLS_Files_SRC",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					]
+				}
+			},
+			{
+				"name": "Filter_Empfiles",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata1').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@contains(toLower(item().name),'emp')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach_SeqNoandFname",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter_Empfiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter_Empfiles').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 5,
+					"activities": [
+						{
+							"name": "AV_SeqNo",
+							"type": "AppendVariable",
+							"typeProperties": {
+								"variableName": "FSeqNo",
+								"value": {
+									"value": "@int(replace(replace(tolower(item().name),'emp',''),'.txt',''))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "AV_FNAMES",
+							"type": "AppendVariable",
+							"typeProperties": {
+								"variableName": "FNAME",
+								"value": {
+									"value": "@string(item().name)",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Variable_MaxSeqNo",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ForEach_SeqNoandFname",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"variableName": "MaxSeqNo",
+					"value": {
+						"value": "@string(max(variables('FSeqNo')))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Filter_MaxFile",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Set Variable_MaxSeqNo",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('FNAME')",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@contains(item(),variables('MaxSeqNo'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Variable_MaxFileName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Filter_MaxFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"variableName": "MaxFileName",
+					"value": {
+						"value": "@activity('Filter_MaxFile').output.value[0]",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "CPY_MaxFile",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set Variable_MaxFileName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "AzureDataLakeStoreSource",
+						"recursive": true
+					},
+					"sink": {
+						"type": "AzureDataLakeStoreSink",
+						"copyBehavior": "PreserveHierarchy"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ADLS_EMP_Max_SRC",
+						"type": "DatasetReference",
+						"parameters": {
+							"FileName": {
+								"value": "@variables('MaxFileName')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_EMP_Max_TGT",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"variables": {
+			"FNAME": {
+				"type": "Array"
+			},
+			"FSeqNo": {
+				"type": "Array"
+			},
+			"MaxSeqNo": {
+				"type": "String"
+			},
+			"MaxFileName": {
+				"type": "String"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
