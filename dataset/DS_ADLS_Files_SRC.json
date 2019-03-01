@@ -35,7 +35,7 @@
 				"firstRowAsHeader": true
 			},
 			"fileName": "",
-			"folderPath": "EMP"
+			"folderPath": "EMP/Employees"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
