@@ -1,0 +1,44 @@
+{
+    "name": "PL_SP_UpSert_Employee_SCD1",
+    "properties": {
+        "activities": [
+            {
+                "name": "CPY_Upsert_Employee",
+                "type": "Copy",
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureDataLakeStoreSource",
+                        "recursive": true
+                    },
+                    "sink": {
+                        "type": "SqlSink",
+                        "writeBatchSize": 10000,
+                        "sqlWriterStoredProcedureName": "[dbo].[spUpsertEmployee]",
+                        "sqlWriterTableType": "EmployeeType"
+                    },
+                    "enableStaging": false
+                },
+                "inputs": [
+                    {
+                        "referenceName": "DS_ADLS_Upsert_Employee",
+                        "type": "DatasetReference"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "DS_Upsert_Employee_TGT",
+                        "type": "DatasetReference"
+                    }
+                ]
+            }
+        ]
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
