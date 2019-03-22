@@ -1,0 +1,14 @@
+{
+    "name": "DS_Upsert_Employee_TGT",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "LS_ASQL",
+            "type": "LinkedServiceReference"
+        },
+        "type": "AzureSqlTable",
+        "typeProperties": {
+            "tableName": "employee"
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}
