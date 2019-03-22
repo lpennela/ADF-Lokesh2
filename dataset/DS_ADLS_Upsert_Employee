@@ -1,0 +1,51 @@
+{
+    "name": "DS_ADLS_Upsert_Employee",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "LS_ADLS",
+            "type": "LinkedServiceReference"
+        },
+        "type": "AzureDataLakeStoreFile",
+        "structure": [
+            {
+                "name": "EID",
+                "type": "Int32"
+            },
+            {
+                "name": "DEPT",
+                "type": "String"
+            },
+            {
+                "name": "FNAME",
+                "type": "String"
+            },
+            {
+                "name": "LNAME",
+                "type": "String"
+            },
+            {
+                "name": "GENDER",
+                "type": "String"
+            },
+            {
+                "name": "ROLL",
+                "type": "String"
+            }
+        ],
+        "typeProperties": {
+            "format": {
+                "type": "TextFormat",
+                "columnDelimiter": ",",
+                "rowDelimiter": "",
+                "quoteChar": "\"",
+                "nullValue": "",
+                "treatEmptyAsNull": true,
+                "skipLineCount": 0,
+                "firstRowAsHeader": true
+            },
+            "fileName": "Employee.txt",
+            "folderPath": "EMP"
+        }
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}
