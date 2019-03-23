@@ -65,7 +65,7 @@
 		},
 		"DS_BLOB_Event_TGT_properties_typeProperties_folderPath": {
 			"type": "string",
-			"defaultValue": "lokesh/inbound"
+			"defaultValue": "lokesh/Inbound"
 		},
 		"LS_ADLS_properties_typeProperties_dataLakeStoreUri": {
 			"type": "string",

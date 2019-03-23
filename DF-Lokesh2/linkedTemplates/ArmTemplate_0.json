@@ -85,7 +85,7 @@
 		},
 		"DS_BLOB_Event_TGT_properties_typeProperties_folderPath": {
 			"type": "string",
-			"defaultValue": "lokesh/inbound"
+			"defaultValue": "lokesh/Inbound"
 		},
 		"Trigger_BLOB_properties_typeProperties_scope": {
 			"type": "string",
