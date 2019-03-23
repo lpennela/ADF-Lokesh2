@@ -1,0 +1,567 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "DF-Lokesh2"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_ADLS_to_ADLS_MAX_SEQ_FIlE_CPY')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DS_ADLS_Files_SRC",
+								"type": "DatasetReference"
+							},
+							"fieldList": [
+								"childItems"
+							]
+						}
+					},
+					{
+						"name": "Filter_Empfiles",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata1').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@contains(toLower(item().name),'emp')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach_SeqNoandFname",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter_Empfiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter_Empfiles').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 5,
+							"activities": [
+								{
+									"name": "AV_SeqNo",
+									"type": "AppendVariable",
+									"typeProperties": {
+										"variableName": "FSeqNo",
+										"value": {
+											"value": "@int(replace(replace(tolower(item().name),'emp',''),'.txt',''))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "AV_FNAMES",
+									"type": "AppendVariable",
+									"typeProperties": {
+										"variableName": "FNAME",
+										"value": {
+											"value": "@string(item().name)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set Variable_MaxSeqNo",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "ForEach_SeqNoandFname",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"typeProperties": {
+							"variableName": "MaxSeqNo",
+							"value": {
+								"value": "@string(max(variables('FSeqNo')))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Filter_MaxFile",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Set Variable_MaxSeqNo",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('FNAME')",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@contains(item(),variables('MaxSeqNo'))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Variable_MaxFileName",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Filter_MaxFile",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"typeProperties": {
+							"variableName": "MaxFileName",
+							"value": {
+								"value": "@activity('Filter_MaxFile').output.value[0]",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "CPY_MaxFile",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set Variable_MaxFileName",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "AzureDataLakeStoreSource",
+								"recursive": true
+							},
+							"sink": {
+								"type": "AzureDataLakeStoreSink",
+								"copyBehavior": "PreserveHierarchy"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_ADLS_EMP_Max_SRC",
+								"type": "DatasetReference",
+								"parameters": {
+									"FileName": {
+										"value": "@variables('MaxFileName')",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_ADLS_EMP_Max_TGT",
+								"type": "DatasetReference"
+							}
+						]
+					}
+				],
+				"variables": {
+					"FNAME": {
+						"type": "Array"
+					},
+					"FSeqNo": {
+						"type": "Array"
+					},
+					"MaxSeqNo": {
+						"type": "String"
+					},
+					"MaxFileName": {
+						"type": "String"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_Files_SRC')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_EMP_Max_SRC')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_EMP_Max_TGT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_Event')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Data1",
+						"type": "Copy",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "BlobSource",
+								"recursive": true
+							},
+							"sink": {
+								"type": "BlobSink"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_BLOB_Event_SRC",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_BLOB_Event_TGT",
+								"type": "DatasetReference"
+							}
+						]
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_BLOB_Event_SRC')]",
+				"[concat(variables('factoryId'), '/datasets/DS_BLOB_Event_TGT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_SP_UpSert_Employee_SCD1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CPY_Upsert_Employee",
+						"type": "Copy",
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"typeProperties": {
+							"source": {
+								"type": "AzureDataLakeStoreSource",
+								"recursive": true
+							},
+							"sink": {
+								"type": "SqlSink",
+								"writeBatchSize": 10000,
+								"sqlWriterStoredProcedureName": "[concat('[', 'dbo].[spUpsertEmployee]')]",
+								"sqlWriterTableType": "EmployeeType"
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_ADLS_Upsert_Employee",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Upsert_Employee_TGT",
+								"type": "DatasetReference"
+							}
+						]
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_Upsert_Employee')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Upsert_Employee_TGT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_EMP_Max_SRC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileName": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Max EMP File Extract"
+				},
+				"type": "AzureDataLakeStoreFile",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": {
+						"value": "@dataset().FileName",
+						"type": "Expression"
+					},
+					"folderPath": "EMP/Employees"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_EMP_Max_TGT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Max EMP File Extract"
+				},
+				"type": "AzureDataLakeStoreFile",
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"nullValue": "\\N",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": false
+					},
+					"fileName": "",
+					"folderPath": "Outbound/Emp_Max"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Files_SRC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Max EMP File Extract"
+				},
+				"type": "AzureDataLakeStoreFile",
+				"structure": [
+					{
+						"name": "DID",
+						"type": "String"
+					},
+					{
+						"name": "DNAME",
+						"type": "String"
+					},
+					{
+						"name": "MGR",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "",
+					"folderPath": "EMP/Employees"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Upsert_Employee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureDataLakeStoreFile",
+				"structure": [
+					{
+						"name": "EID",
+						"type": "Int32"
+					},
+					{
+						"name": "DEPT",
+						"type": "String"
+					},
+					{
+						"name": "FNAME",
+						"type": "String"
+					},
+					{
+						"name": "LNAME",
+						"type": "String"
+					},
+					{
+						"name": "GENDER",
+						"type": "String"
+					},
+					{
+						"name": "ROLL",
+						"type": "String"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "TextFormat",
+						"columnDelimiter": ",",
+						"rowDelimiter": "",
+						"quoteChar": "\"",
+						"nullValue": "",
+						"treatEmptyAsNull": true,
+						"skipLineCount": 0,
+						"firstRowAsHeader": true
+					},
+					"fileName": "Employee.txt",
+					"folderPath": "EMP"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_Event_SRC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_BLOB",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"typeProperties": {
+					"fileName": "*.txt",
+					"folderPath": "lokesh"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_Event_TGT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_BLOB",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureBlob",
+				"typeProperties": {
+					"fileName": "",
+					"folderPath": "lokesh/Outbound"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_Upsert_Employee_TGT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ASQL",
+					"type": "LinkedServiceReference"
+				},
+				"type": "AzureSqlTable",
+				"typeProperties": {
+					"tableName": "employee"
+				}
+			}
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger_BLOB')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PL_Event",
+							"type": "PipelineReference"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/lokesh/",
+					"blobPathEndsWith": "lokesh/emp.txt",
+					"scope": "/subscriptions/cb8eca64-bfd6-4bd8-b710-6e1f30e399d1/resourceGroups/RG_Lokesh/providers/Microsoft.Storage/storageAccounts/storageaccountlokesh2",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PL_Event')]"
+			]
+		}
+	]
+}

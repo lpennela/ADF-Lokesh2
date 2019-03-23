@@ -1,0 +1,78 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "DF-Lokesh2"
+		},
+		"LS_ADLS_servicePrincipalKey": {
+			"value": ""
+		},
+		"LS_ASQL_connectionString": {
+			"value": ""
+		},
+		"LS_BLOB_connectionString": {
+			"value": ""
+		},
+		"DS_ADLS_EMP_Max_SRC_properties_typeProperties_fileName": {
+			"value": "@dataset().FileName"
+		},
+		"DS_ADLS_EMP_Max_SRC_properties_typeProperties_folderPath": {
+			"value": "EMP/Employees"
+		},
+		"DS_ADLS_EMP_Max_TGT_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DS_ADLS_EMP_Max_TGT_properties_typeProperties_folderPath": {
+			"value": "Outbound/Emp_Max"
+		},
+		"DS_ADLS_Files_SRC_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DS_ADLS_Files_SRC_properties_typeProperties_folderPath": {
+			"value": "EMP/Employees"
+		},
+		"DS_ADLS_Upsert_Employee_properties_typeProperties_fileName": {
+			"value": "Employee.txt"
+		},
+		"DS_ADLS_Upsert_Employee_properties_typeProperties_folderPath": {
+			"value": "EMP"
+		},
+		"DS_BLOB_Event_SRC_properties_typeProperties_fileName": {
+			"value": "*.txt"
+		},
+		"DS_BLOB_Event_SRC_properties_typeProperties_folderPath": {
+			"value": "lokesh"
+		},
+		"DS_BLOB_Event_TGT_properties_typeProperties_fileName": {
+			"value": ""
+		},
+		"DS_BLOB_Event_TGT_properties_typeProperties_folderPath": {
+			"value": "lokesh/Outbound"
+		},
+		"LS_ADLS_properties_typeProperties_dataLakeStoreUri": {
+			"value": "https://adlslokesh2.azuredatalakestore.net/webhdfs/v1"
+		},
+		"LS_ADLS_properties_typeProperties_servicePrincipalId": {
+			"value": "506f7cec-1d8f-4578-87a5-5d73dd551530"
+		},
+		"LS_ADLS_properties_typeProperties_tenant": {
+			"value": "59843051-b9bd-40fa-8400-b19d744add1c"
+		},
+		"LS_ADLS_properties_typeProperties_subscriptionId": {
+			"value": "cb8eca64-bfd6-4bd8-b710-6e1f30e399d1"
+		},
+		"LS_ADLS_properties_typeProperties_resourceGroupName": {
+			"value": "RG_Lokesh"
+		},
+		"Trigger_BLOB_properties_typeProperties_scope": {
+			"value": "/subscriptions/cb8eca64-bfd6-4bd8-b710-6e1f30e399d1/resourceGroups/RG_Lokesh/providers/Microsoft.Storage/storageAccounts/storageaccountlokesh2"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
