@@ -8,7 +8,7 @@
 		"type": "AzureBlob",
 		"typeProperties": {
 			"fileName": "",
-			"folderPath": "lokesh/inbound"
+			"folderPath": "lokesh/Inbound"
 		}
 	}
 }
