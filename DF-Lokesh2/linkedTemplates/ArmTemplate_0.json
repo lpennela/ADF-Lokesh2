@@ -738,10 +738,11 @@
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
 					"blobPathBeginsWith": "/lokesh/",
-					"blobPathEndsWith": "lokesh/emp.txt",
+					"blobPathEndsWith": "outbound/emp.txt",
 					"scope": "[parameters('Trigger_BLOB_properties_typeProperties_scope')]",
 					"events": [
-						"Microsoft.Storage.BlobCreated"
+						"Microsoft.Storage.BlobCreated",
+						"Microsoft.Storage.BlobDeleted"
 					]
 				}
 			},
