@@ -13,10 +13,11 @@
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/lokesh/",
-			"blobPathEndsWith": "lokesh/emp.txt",
+			"blobPathEndsWith": "outbound/emp.txt",
 			"scope": "/subscriptions/cb8eca64-bfd6-4bd8-b710-6e1f30e399d1/resourceGroups/RG_Lokesh/providers/Microsoft.Storage/storageAccounts/storageaccountlokesh2",
 			"events": [
-				"Microsoft.Storage.BlobCreated"
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
 			]
 		}
 	}
