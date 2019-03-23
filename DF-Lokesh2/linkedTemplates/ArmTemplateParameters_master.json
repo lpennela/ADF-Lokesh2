@@ -48,7 +48,7 @@
 			"value": ""
 		},
 		"DS_BLOB_Event_TGT_properties_typeProperties_folderPath": {
-			"value": "lokesh/Outbound"
+			"value": "lokesh/inbound"
 		},
 		"LS_ADLS_properties_typeProperties_dataLakeStoreUri": {
 			"value": "https://adlslokesh2.azuredatalakestore.net/webhdfs/v1"
