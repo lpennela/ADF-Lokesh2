@@ -2,14 +2,6 @@
 	"name": "Trigger_BLOB",
 	"properties": {
 		"runtimeState": "Started",
-		"pipelines": [
-			{
-				"pipelineReference": {
-					"referenceName": "PL_Event",
-					"type": "PipelineReference"
-				}
-			}
-		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
 			"blobPathBeginsWith": "/lokesh/",
