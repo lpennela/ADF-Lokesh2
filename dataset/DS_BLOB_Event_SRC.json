@@ -1,0 +1,14 @@
+{
+	"name": "DS_BLOB_Event_SRC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_BLOB",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"fileName": "*.txt",
+			"folderPath": "lokesh"
+		}
+	}
+}
