@@ -1,0 +1,13 @@
+{
+	"name": "DS_SourceData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASQL_DB",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"typeProperties": {
+			"tableName": "[dbo].[data_source_table]"
+		}
+	}
+}
