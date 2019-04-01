@@ -5,6 +5,9 @@
 			"referenceName": "LS_ASQL_DB",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Incremental_Load"
+		},
 		"type": "AzureSqlTable",
 		"typeProperties": {
 			"tableName": "[dbo].[data_source_table]"

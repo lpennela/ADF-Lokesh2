@@ -1,12 +1,9 @@
 {
-	"name": "DS_WatermarkTable",
+	"name": "DS_Incremental_Load_WatermarkTable",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_ASQL_DB",
+			"referenceName": "LS_SQL_DB_TGT",
 			"type": "LinkedServiceReference"
-		},
-		"folder": {
-			"name": "Incremental_Load"
 		},
 		"type": "AzureSqlTable",
 		"typeProperties": {

@@ -1,0 +1,35 @@
+{
+	"name": "DS_Incremental_Load_TGT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB_TGT",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SinkTableName": {
+				"type": "String"
+			}
+		},
+		"type": "AzureSqlTable",
+		"structure": [
+			{
+				"name": "PersonID",
+				"type": "Int32"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "LastModifytime",
+				"type": "DateTime"
+			}
+		],
+		"typeProperties": {
+			"tableName": {
+				"value": "@dataset().SinkTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}
