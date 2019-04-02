@@ -11,20 +11,6 @@
 			}
 		},
 		"type": "AzureSqlTable",
-		"structure": [
-			{
-				"name": "PersonID",
-				"type": "Int32"
-			},
-			{
-				"name": "Name",
-				"type": "String"
-			},
-			{
-				"name": "LastModifytime",
-				"type": "DateTime"
-			}
-		],
 		"typeProperties": {
 			"tableName": {
 				"value": "@dataset().SinkTableName",

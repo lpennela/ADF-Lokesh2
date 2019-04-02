@@ -49,7 +49,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "SqlSource",
-									"sqlReaderQuery": "select MAX(@{item().WaterMark_Column}) as NewWatermarkvalue from @{item().TABLE_NAME}"
+									"sqlReaderQuery": {
+										"value": "select MAX(@{item().WaterMark_Column}) as NewWatermarkvalue from @{item().TABLE_NAME}",
+										"type": "Expression"
+									}
 								},
 								"dataset": {
 									"referenceName": "DS_Incremental_Load_SRC",
@@ -167,7 +170,21 @@
 		],
 		"parameters": {
 			"TableList": {
-				"type": "Object"
+				"type": "Object",
+				"defaultValue": [
+					{
+						"TABLE_NAME": "customer_table",
+						"WaterMark_Column": "LastModifytime",
+						"TableType": "DataTypeforCustomerTable",
+						"StoredProcedureNameForMergeOperation": "usp_upsert_customer_table"
+					},
+					{
+						"TABLE_NAME": "project_table",
+						"WaterMark_Column": "Creationtime",
+						"TableType": "DataTypeforProjectTable",
+						"StoredProcedureNameForMergeOperation": "usp_upsert_project_table"
+					}
+				]
 			}
 		}
 	}
