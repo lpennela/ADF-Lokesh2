@@ -1,0 +1,13 @@
+{
+	"name": "DS_Incremental_Load_WatermarkTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB_TGT",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"typeProperties": {
+			"tableName": "[dbo].[watermarktable]"
+		}
+	}
+}
