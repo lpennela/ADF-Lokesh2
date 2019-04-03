@@ -10,6 +10,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "Incremental_Load_Multiple_Tables"
+		},
 		"type": "AzureSqlTable",
 		"typeProperties": {
 			"tableName": {

@@ -163,6 +163,44 @@
 								"referenceName": "LS_SQL_DB_TGT",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "WebActivity1",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "IncrementalCopyActivity",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"url": "https://prod-16.eastus2.logic.azure.com:443/workflows/aec59aa028b44cfbb72f41c6c3c303e8/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pHbTaTeRaosaOXhi_5W8k03jZ-x84lOI8pMHu7FX4JA",
+								"method": "POST",
+								"headers": {
+									"dataFactoryName": {
+										"value": "@pipeline().DataFactory",
+										"type": "Expression"
+									},
+									"pipelineName": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"message": {
+										"value": "@activity('IncrementalCopyActivity').output.errors",
+										"type": "Expression"
+									}
+								},
+								"body": "dataFactoryName = @pipeline().DataFactory\npipelineName=@pipeline().Pipeline\nmessage=@activity('IncrementalCopyActivity').output.errors"
+							}
 						}
 					]
 				}

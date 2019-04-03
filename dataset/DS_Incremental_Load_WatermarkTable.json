@@ -5,6 +5,9 @@
 			"referenceName": "LS_SQL_DB_TGT",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Incremental_Load_Multiple_Tables"
+		},
 		"type": "AzureSqlTable",
 		"typeProperties": {
 			"tableName": "[dbo].[watermarktable]"
