@@ -113,16 +113,20 @@
 		],
 		"parameters": {
 			"SubscriptionID": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "9d596c95-6183-4322-967a-2b3106a6143d"
 			},
 			"ResourceGroup": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "RG-Lokesh"
 			},
 			"Server": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "sqlserverlokesh"
 			},
 			"DW": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "SQL_DW"
 			}
 		}
 	},
